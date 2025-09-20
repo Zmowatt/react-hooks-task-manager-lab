@@ -3,22 +3,35 @@ import { TaskContext } from "../context/TaskContext";
 
 function TaskList({query}) {
     const [tasks, setTasks] = useState([]);
-    const filteredTasks = tasks.filter(task =>
-    task.title.toLowerCase().includes(query.toLowerCase())
-  );
+    const { tasks: ctxTasks, toggleComplete } = useContext(TaskContext);
+
+    const q = (query ?? "").toLowerCase();
+    const filteredTasks = ctxTasks.filter((t) => {
+      const title = (t.title ?? t.name ?? t.task ?? "");
+      return title.toLowerCase().includes(q);
+    });
 
   return (
     <ul>
-      {filteredTasks.map((task) => (
-        <li key={task.id}>
-          <span style={{ textDecoration: task.completed ? "line-through" : "none" }}>
-            {task.title}
-          </span>
-          <button data-testid={task.id}>
-            {task.completed ? "Undo" : "Complete"}
-          </button>
-        </li>
-      ))}
+      {filteredTasks.map((t, idx) => {
+        const id = t.id ?? t.taskId;
+        const title = t.title ?? t.name ?? t.task ?? "";
+        const key = id ?? `task-${idx}`;
+
+        return (
+          <li key={key}>
+            <span style={{ textDecoration: t.completed ? "line-through" : "none" }}>
+              {title}
+            </span>
+            <button
+              data-testid={String(id ?? idx)}
+              onClick={() => id != null && toggleComplete(id)}
+            >
+              {t.completed ? "Undo" : "Mark Complete"}
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 }

@@ -10,7 +10,6 @@ function App() {
     fetch('http://localhost:6001/tasks')
     .then(r=>r.json())
     .then(data=>setTasks(data))
-    
   }, []);
 
   return (
